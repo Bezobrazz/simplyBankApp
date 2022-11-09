@@ -82,3 +82,15 @@ const displayTransactions = function (transactions) {
   });
 };
 displayTransactions(account1.transactions);
+
+const createNickName = function (accs) {
+  accs.forEach(function (acc) {
+    acc.nickName = acc.userName
+      .toLowerCase()
+      .split(' ')
+      .map(word => word[0])
+      .join('');
+  });
+};
+createNickName(accounts);
+console.log(accounts);
