@@ -75,7 +75,7 @@ const displayTransactions = function (transactions) {
 		<div class="transactions__type transactions__type--${transType}">
 			${index + 1} ${transType}
 		</div>
-		<div class="transactions__value">${trans}</div>
+		<div class="transactions__value">${trans}$</div>
 	</div>`;
 
     containerTransactions.insertAdjacentHTML('afterbegin', transactionsRow);
@@ -94,3 +94,10 @@ const createNickName = function (accs) {
 };
 createNickName(accounts);
 console.log(accounts);
+
+const displayBalance = function (transactions) {
+  const balance = transactions.reduce((acc, elem) => acc + elem);
+  console.log(balance);
+  labelBalance.textContent = `${balance}$`;
+};
+displayBalance(account1.transactions);
