@@ -97,7 +97,27 @@ console.log(accounts);
 
 const displayBalance = function (transactions) {
   const balance = transactions.reduce((acc, elem) => acc + elem);
-  console.log(balance);
   labelBalance.textContent = `${balance}$`;
 };
 displayBalance(account1.transactions);
+
+const displayTotal = function (transactions) {
+  const dipositTotal = transactions
+    .filter(trans => trans > 0)
+    .reduce((acc, trans) => acc + trans, 0);
+  labelSumIn.textContent = `${dipositTotal}$`;
+
+  const withdrawalTotal = transactions
+    .filter(trans => trans < 0)
+    .reduce((acc, trans) => acc + trans, 0);
+  labelSumOut.textContent = `${withdrawalTotal}$`;
+
+  const interestTotal = transactions
+    .filter(trans => trans > 0)
+    .map(depos => (depos * 1.5) / 100)
+    .filter(depos => depos >= 5)
+    .reduce((acc, interest) => acc + interest, 0);
+
+  labelSumInterest.textContent = `${interestTotal}$`;
+};
+displayTotal(account1.transactions);
