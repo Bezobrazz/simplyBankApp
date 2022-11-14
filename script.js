@@ -57,6 +57,7 @@ const btnLoan = document.querySelector('.form__btn--loan');
 const btnClose = document.querySelector('.form__btn--close');
 const btnSort = document.querySelector('.btn--sort');
 
+const informationText = document.querySelector('.operation__title');
 const inputLoginUsername = document.querySelector('.login__input--user');
 const inputLoginPin = document.querySelector('.login__input--pin');
 const inputTransferTo = document.querySelector('.form__input--to');
@@ -95,55 +96,99 @@ const createNickName = function (accs) {
 createNickName(accounts);
 console.log(accounts);
 
-const displayBalance = function (transactions) {
-  const balance = transactions.reduce((acc, elem) => acc + elem);
+const displayBalance = function (account) {
+  const balance = account.transactions.reduce((acc, elem) => acc + elem, 0);
+  account.balance = balance;
   labelBalance.textContent = `${balance}$`;
 };
 
-const displayTotal = function (accaunt) {
-  const dipositTotal = accaunt.transactions
+const displayTotal = function (account) {
+  const dipositTotal = account.transactions
     .filter(trans => trans > 0)
     .reduce((acc, trans) => acc + trans, 0);
   labelSumIn.textContent = `${dipositTotal}$`;
 
-  const withdrawalTotal = accaunt.transactions
+  const withdrawalTotal = account.transactions
     .filter(trans => trans < 0)
     .reduce((acc, trans) => acc + trans, 0);
   labelSumOut.textContent = `${withdrawalTotal}$`;
 
-  const interestTotal = accaunt.transactions
+  const interestTotal = account.transactions
     .filter(trans => trans > 0)
-    .map(depos => (depos * accaunt.interest) / 100)
+    .map(depos => (depos * account.interest) / 100)
     .filter(depos => depos >= 5)
     .reduce((acc, interest) => acc + interest, 0);
 
   labelSumInterest.textContent = `${interestTotal}$`;
 };
 
-let currentAccaunt;
+const updateUi = function (account) {
+  // Display transactions
+  displayTransactions(account.transactions);
+  // Display balance
+  displayBalance(account);
+  // Display total
+  displayTotal(account);
+};
+
+let currentAccount;
 
 btnLogin.addEventListener('click', function (event) {
   event.preventDefault();
-  currentAccaunt = accounts.find(
-    accaunt => accaunt.nickName === inputLoginUsername.value
+  currentAccount = accounts.find(
+    account => account.nickName === inputLoginUsername.value
   );
-  console.log(currentAccaunt);
-  if (currentAccaunt?.pin === Number(inputLoginPin.value)) {
+  console.log(currentAccount);
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
     // Display UI and welcome message
     containerApp.style.opacity = 100;
     labelWelcome.textContent = `З поверненням, ${
-      currentAccaunt.userName.split(' ')[0]
+      currentAccount.userName.split(' ')[0]
     }!`;
 
     // Clear inputs
     inputLoginUsername.value = '';
     inputLoginPin.value = '';
     inputLoginPin.blur();
-    // Display transactions
-    displayTransactions(currentAccaunt.transactions);
-    // Display balance
-    displayBalance(currentAccaunt.transactions);
-    // Display total
-    displayTotal(currentAccaunt);
+
+    updateUi(currentAccount);
+  }
+});
+
+btnTransfer.addEventListener('click', function (event) {
+  event.preventDefault();
+  const transferAmount = Number(inputTransferAmount.value);
+  const recipientNickName = inputTransferTo.value;
+  const recipientAccount = accounts.find(
+    account => account.nickName === recipientNickName
+  );
+  // if (
+  //   transferAmount > 0 &&
+  //   currentAccount.balance >= transferAmount &&
+  //   recipientAccount &&
+  //   currentAccount !== recipientAccount.nickName
+  // ) {
+  //   console.log('transfer');
+  // }
+  if (
+    transferAmount > 0 &&
+    currentAccount.balance >= transferAmount &&
+    recipientAccount &&
+    currentAccount.nickName !== recipientAccount.nickName
+  ) {
+    console.log('transfer');
+    informationText.textContent = 'Кошти надіслано';
+    informationText.style.color = 'green';
+    currentAccount.transactions.push(-transferAmount);
+    recipientAccount.transactions.push(transferAmount);
+    updateUi(currentAccount);
+    inputTransferTo.value = '';
+    inputTransferAmount.value = '';
+  } else if (currentAccount.balance < transferAmount) {
+    informationText.textContent = 'Недостатньо коштів';
+    informationText.style.color = 'red';
+  } else if (currentAccount.nickName !== recipientNickName) {
+    informationText.textContent = 'Немає такого отримувача';
+    informationText.style.color = 'red';
   }
 });
