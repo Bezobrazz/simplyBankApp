@@ -63,8 +63,13 @@ const inputLoginPin = document.querySelector('.login__input--pin');
 const inputTransferTo = document.querySelector('.form__input--to');
 const inputTransferAmount = document.querySelector('.form__input--amount');
 const inputLoanAmount = document.querySelector('.form__input--loan-amount');
-const inputCloseUsername = document.querySelector('.form__input--user');
+const inputCloseNickname = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
+const operationCloseTitle = document.querySelector('.operation--close_title');
+
+const deletelConfirmationModal = document.querySelector('.modal__container');
+const deletelConfirmationYes = document.querySelector('.modal__btn-yes');
+const deletelConfirmationNo = document.querySelector('.modal__btn-no');
 
 const displayTransactions = function (transactions) {
   containerTransactions.innerHTML = '';
@@ -133,6 +138,8 @@ const updateUi = function (account) {
 
 let currentAccount;
 
+// Event heandlers
+
 btnLogin.addEventListener('click', function (event) {
   event.preventDefault();
   currentAccount = accounts.find(
@@ -191,4 +198,33 @@ btnTransfer.addEventListener('click', function (event) {
     informationText.textContent = 'Немає такого отримувача';
     informationText.style.color = 'red';
   }
+});
+
+btnClose.addEventListener('click', function (event) {
+  event.preventDefault();
+  if (
+    inputCloseNickname.value === currentAccount.nickName &&
+    Number(inputClosePin.value) === currentAccount.pin
+  ) {
+    deletelConfirmationModal.style.display = 'block';
+    operationCloseTitle.textContent = 'Закрити рахунок';
+    operationCloseTitle.style.color = '#333';
+  } else {
+    operationCloseTitle.textContent = 'Ім`я чи PIN не вірні';
+    operationCloseTitle.style.color = 'yellow';
+  }
+  deletelConfirmationNo.addEventListener('click', function () {
+    deletelConfirmationModal.style.display = 'none';
+  });
+  deletelConfirmationYes.addEventListener('click', function () {
+    const curentAccountIndex = accounts.findIndex(
+      account => account.nickName === currentAccount.nickName
+    );
+    accounts.splice(curentAccountIndex, 1);
+    containerApp.style.opacity = 0;
+    labelWelcome.textContent = 'Увійдіть у свій акаунт';
+    deletelConfirmationModal.style.display = 'none';
+    inputCloseNickname.value = '';
+    inputClosePin.value = '';
+  });
 });
