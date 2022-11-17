@@ -63,6 +63,7 @@ const inputLoginPin = document.querySelector('.login__input--pin');
 const inputTransferTo = document.querySelector('.form__input--to');
 const inputTransferAmount = document.querySelector('.form__input--amount');
 const inputLoanAmount = document.querySelector('.form__input--loan-amount');
+const loanTitle = document.querySelector('.operation__loan-title');
 const inputCloseNickname = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 const operationCloseTitle = document.querySelector('.operation--close_title');
@@ -71,10 +72,14 @@ const deletelConfirmationModal = document.querySelector('.modal__container');
 const deletelConfirmationYes = document.querySelector('.modal__btn-yes');
 const deletelConfirmationNo = document.querySelector('.modal__btn-no');
 
-const displayTransactions = function (transactions) {
+const displayTransactions = function (transactions, sort = false) {
   containerTransactions.innerHTML = '';
 
-  transactions.forEach(function (trans, index) {
+  const transac = sort
+    ? transactions.slice().sort((x, y) => x - y)
+    : transactions;
+
+  transac.forEach(function (trans, index) {
     const transType = trans > 0 ? 'deposit' : 'withdrawal';
     const transactionsRow = `
 		<div class="transactions__row">
@@ -227,4 +232,31 @@ btnClose.addEventListener('click', function (event) {
     inputCloseNickname.value = '';
     inputClosePin.value = '';
   });
+});
+
+btnLoan.addEventListener('click', function (event) {
+  event.preventDefault();
+  const loanAmount = Number(inputLoanAmount.value);
+  const maxTransaction = Math.max(...currentAccount.transactions);
+  console.log(maxTransaction);
+  if (
+    loanAmount > 0 &&
+    currentAccount.transactions.some(trans => trans >= (loanAmount * 10) / 100)
+  ) {
+    currentAccount.transactions.push(loanAmount);
+    updateUi(currentAccount);
+    inputLoanAmount.value = '';
+    loanTitle.textContent = 'Позика отримана, вітаємо!';
+    loanTitle.style.color = 'green'; //set timer change color to #333
+  } else if (loanAmount > maxTransaction) {
+    loanTitle.textContent = `Максимальна позика ${maxTransaction * 10}$`;
+    loanTitle.style.color = 'red';
+  }
+});
+
+let transactionsSorted = false;
+btnSort.addEventListener('click', function (event) {
+  event.preventDefault;
+  displayTransactions(currentAccount.transactions, !transactionsSorted);
+  transactionsSorted = !transactionsSorted;
 });
