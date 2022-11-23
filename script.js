@@ -7,6 +7,18 @@ const account1 = {
   transactions: [500, 250, -300, 5000, -850, -110, -170, 1100],
   interest: 1.5,
   pin: 1111,
+  transactionsDates: [
+    '2020-10-02T14:43:31.074Z',
+    '2020-10-29T11:24:19.761Z',
+    '2020-11-15T10:45:23.907Z',
+    '2021-01-22T12:17:46.255Z',
+    '2021-02-12T15:14:06.486Z',
+    '2021-03-09T11:42:26.371Z',
+    '2021-05-21T07:43:59.331Z',
+    '2021-06-22T15:21:20.814Z',
+  ],
+  currency: 'USD',
+  locale: 'en-US',
 };
 
 const account2 = {
@@ -14,6 +26,18 @@ const account2 = {
   transactions: [2000, 6400, -1350, -70, -210, -2000, 5500, -30],
   interest: 1.3,
   pin: 2222,
+  transactionsDates: [
+    '2020-10-02T14:43:31.074Z',
+    '2020-10-29T11:24:19.761Z',
+    '2020-11-15T10:45:23.907Z',
+    '2021-01-22T12:17:46.255Z',
+    '2021-02-12T15:14:06.486Z',
+    '2021-03-09T11:42:26.371Z',
+    '2021-05-21T07:43:59.331Z',
+    '2021-06-22T15:21:20.814Z',
+  ],
+  currency: 'UAH',
+  locale: 'uk-UA',
 };
 
 const account3 = {
@@ -21,6 +45,18 @@ const account3 = {
   transactions: [900, -200, 280, 300, -200, 150, 1400, -400],
   interest: 0.8,
   pin: 3333,
+  transactionsDates: [
+    '2020-10-02T14:43:31.074Z',
+    '2020-10-29T11:24:19.761Z',
+    '2020-11-15T10:45:23.907Z',
+    '2021-01-22T12:17:46.255Z',
+    '2021-02-12T15:14:06.486Z',
+    '2021-03-09T11:42:26.371Z',
+    '2021-05-21T07:43:59.331Z',
+    '2021-06-22T15:21:20.814Z',
+  ],
+  currency: 'RUB',
+  locale: 'ru-RU',
 };
 
 const account4 = {
@@ -28,6 +64,18 @@ const account4 = {
   transactions: [530, 1300, 500, 40, 190],
   interest: 1,
   pin: 4444,
+  transactionsDates: [
+    '2020-10-02T14:43:31.074Z',
+    '2020-10-29T11:24:19.761Z',
+    '2020-11-15T10:45:23.907Z',
+    '2021-01-22T12:17:46.255Z',
+    '2021-02-12T15:14:06.486Z',
+    '2021-03-09T11:42:26.371Z',
+    '2021-05-21T07:43:59.331Z',
+    '2021-06-22T15:21:20.814Z',
+  ],
+  currency: 'EUR',
+  locale: 'fr-CA',
 };
 
 const account5 = {
@@ -35,6 +83,18 @@ const account5 = {
   transactions: [630, 800, 300, 50, 120],
   interest: 1.1,
   pin: 5555,
+  transactionsDates: [
+    '2020-10-02T14:43:31.074Z',
+    '2020-10-29T11:24:19.761Z',
+    '2020-11-15T10:45:23.907Z',
+    '2021-01-22T12:17:46.255Z',
+    '2021-02-12T15:14:06.486Z',
+    '2021-03-09T11:42:26.371Z',
+    '2021-05-21T07:43:59.331Z',
+    '2021-06-22T15:21:20.814Z',
+  ],
+  currency: 'USD',
+  locale: 'en-US',
 };
 
 const accounts = [account1, account2, account3, account4, account5];
@@ -86,7 +146,7 @@ const displayTransactions = function (transactions, sort = false) {
 		<div class="transactions__type transactions__type--${transType}">
 			${index + 1} ${transType}
 		</div>
-		<div class="transactions__value">${trans}$</div>
+		<div class="transactions__value">${trans.toFixed(2)}$</div>
 	</div>`;
 
     containerTransactions.insertAdjacentHTML('afterbegin', transactionsRow);
@@ -109,19 +169,19 @@ console.log(accounts);
 const displayBalance = function (account) {
   const balance = account.transactions.reduce((acc, elem) => acc + elem, 0);
   account.balance = balance;
-  labelBalance.textContent = `${balance}$`;
+  labelBalance.textContent = `${balance.toFixed(2)}$`;
 };
 
 const displayTotal = function (account) {
   const dipositTotal = account.transactions
     .filter(trans => trans > 0)
     .reduce((acc, trans) => acc + trans, 0);
-  labelSumIn.textContent = `${dipositTotal}$`;
+  labelSumIn.textContent = `${dipositTotal.toFixed(2)}$`;
 
   const withdrawalTotal = account.transactions
     .filter(trans => trans < 0)
     .reduce((acc, trans) => acc + trans, 0);
-  labelSumOut.textContent = `${withdrawalTotal}$`;
+  labelSumOut.textContent = `${withdrawalTotal.toFixed(2)}$`;
 
   const interestTotal = account.transactions
     .filter(trans => trans > 0)
@@ -129,7 +189,7 @@ const displayTotal = function (account) {
     .filter(depos => depos >= 5)
     .reduce((acc, interest) => acc + interest, 0);
 
-  labelSumInterest.textContent = `${interestTotal}$`;
+  labelSumInterest.textContent = `${interestTotal.toFixed(2)}$`;
 };
 
 const updateUi = function (account) {
@@ -236,7 +296,7 @@ btnClose.addEventListener('click', function (event) {
 
 btnLoan.addEventListener('click', function (event) {
   event.preventDefault();
-  const loanAmount = Number(inputLoanAmount.value);
+  const loanAmount = Math.floor(inputLoanAmount.value);
   const maxTransaction = Math.max(...currentAccount.transactions);
   console.log(maxTransaction);
   if (
@@ -260,3 +320,13 @@ btnSort.addEventListener('click', function (event) {
   displayTransactions(currentAccount.transactions, !transactionsSorted);
   transactionsSorted = !transactionsSorted;
 });
+
+// Вибір кожної другої строки окраси у сірий колір
+// [...document.querySelectorAll('.transactions__row')].forEach(function (
+//   row,
+//   index
+// ) {
+//   if (i % 2 === 0) {
+//     row.style.backgroundColor = 'grey';
+//   }
+// });
