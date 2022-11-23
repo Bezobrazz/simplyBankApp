@@ -70,9 +70,6 @@ const account4 = {
     '2020-11-15T10:45:23.907Z',
     '2021-01-22T12:17:46.255Z',
     '2021-02-12T15:14:06.486Z',
-    '2021-03-09T11:42:26.371Z',
-    '2021-05-21T07:43:59.331Z',
-    '2021-06-22T15:21:20.814Z',
   ],
   currency: 'EUR',
   locale: 'fr-CA',
@@ -89,9 +86,6 @@ const account5 = {
     '2020-11-15T10:45:23.907Z',
     '2021-01-22T12:17:46.255Z',
     '2021-02-12T15:14:06.486Z',
-    '2021-03-09T11:42:26.371Z',
-    '2021-05-21T07:43:59.331Z',
-    '2021-06-22T15:21:20.814Z',
   ],
   currency: 'USD',
   locale: 'en-US',
@@ -132,27 +126,36 @@ const deletelConfirmationModal = document.querySelector('.modal__container');
 const deletelConfirmationYes = document.querySelector('.modal__btn-yes');
 const deletelConfirmationNo = document.querySelector('.modal__btn-no');
 
-const displayTransactions = function (transactions, sort = false) {
+const displayTransactions = function (account, sort = false) {
   containerTransactions.innerHTML = '';
 
   const transac = sort
-    ? transactions.slice().sort((x, y) => x - y)
-    : transactions;
+    ? account.transactions.slice().sort((x, y) => x - y)
+    : account.transactions;
 
   transac.forEach(function (trans, index) {
     const transType = trans > 0 ? 'deposit' : 'withdrawal';
+
+    const date = new Date(account.transactionsDates[index]);
+
+    const day = `${date.getDate()}`.padStart(2, '0');
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const year = date.getFullYear();
+
+    const transDate = `${day}/${month}/${year}`;
+
     const transactionsRow = `
 		<div class="transactions__row">
 		<div class="transactions__type transactions__type--${transType}">
 			${index + 1} ${transType}
 		</div>
+		<div class="transactions__date">${transDate}</div>
 		<div class="transactions__value">${trans.toFixed(2)}$</div>
 	</div>`;
 
     containerTransactions.insertAdjacentHTML('afterbegin', transactionsRow);
   });
 };
-displayTransactions(account1.transactions);
 
 const createNickName = function (accs) {
   accs.forEach(function (acc) {
@@ -194,7 +197,7 @@ const displayTotal = function (account) {
 
 const updateUi = function (account) {
   // Display transactions
-  displayTransactions(account.transactions);
+  displayTransactions(account);
   // Display balance
   displayBalance(account);
   // Display total
@@ -203,8 +206,18 @@ const updateUi = function (account) {
 
 let currentAccount;
 
-// Event heandlers
+// Alwayes logged in
+// currentAccount = account1;
+// containerApp.style.opacity = '100';
 
+const now = new Date();
+const day = `${now.getDate()}`.padStart(2, '0');
+const month = `${now.getMonth() + 1}`.padStart(2, '0');
+const year = now.getFullYear();
+
+labelDate.textContent = `${day}/${month}/${year}`;
+
+// Event heandlers
 btnLogin.addEventListener('click', function (event) {
   event.preventDefault();
   currentAccount = accounts.find(
@@ -251,8 +264,12 @@ btnTransfer.addEventListener('click', function (event) {
     console.log('transfer');
     informationText.textContent = 'Кошти надіслано';
     informationText.style.color = 'green';
+    // Add transactions
     currentAccount.transactions.push(-transferAmount);
     recipientAccount.transactions.push(transferAmount);
+    // Add transaction date
+    currentAccount.transactionsDates.push(new Date().toISOString());
+    recipientAccount.transactionsDates.push(new Date().toISOString());
     updateUi(currentAccount);
     inputTransferTo.value = '';
     inputTransferAmount.value = '';
@@ -304,6 +321,7 @@ btnLoan.addEventListener('click', function (event) {
     currentAccount.transactions.some(trans => trans >= (loanAmount * 10) / 100)
   ) {
     currentAccount.transactions.push(loanAmount);
+    currentAccount.transactionsDates.push(new Date().toISOString());
     updateUi(currentAccount);
     inputLoanAmount.value = '';
     loanTitle.textContent = 'Позика отримана, вітаємо!';
@@ -317,7 +335,7 @@ btnLoan.addEventListener('click', function (event) {
 let transactionsSorted = false;
 btnSort.addEventListener('click', function (event) {
   event.preventDefault;
-  displayTransactions(currentAccount.transactions, !transactionsSorted);
+  displayTransactions(currentAccount, !transactionsSorted);
   transactionsSorted = !transactionsSorted;
 });
 
