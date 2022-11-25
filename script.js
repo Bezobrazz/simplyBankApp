@@ -14,8 +14,8 @@ const account1 = {
     '2021-01-22T12:17:46.255Z',
     '2021-02-12T15:14:06.486Z',
     '2021-03-09T11:42:26.371Z',
-    '2021-05-21T07:43:59.331Z',
-    '2021-06-22T15:21:20.814Z',
+    '2022-11-23T07:43:59.331Z',
+    '2022-11-24T15:21:20.814Z',
   ],
   currency: 'USD',
   locale: 'en-US',
@@ -126,6 +126,22 @@ const deletelConfirmationModal = document.querySelector('.modal__container');
 const deletelConfirmationYes = document.querySelector('.modal__btn-yes');
 const deletelConfirmationNo = document.querySelector('.modal__btn-no');
 
+const formatTransactionDate = function (date) {
+  const getDaysBetweenTwoDates = (date1, date2) =>
+    Math.round(Math.abs((date2 - date1) / (1000 * 60 * 60 * 24)));
+  const daysPassed = getDaysBetweenTwoDates(new Date(), date);
+  console.log(daysPassed);
+  if (daysPassed === 0) return 'Сьогодні';
+  if (daysPassed === 1) return 'Вчора';
+  if (daysPassed <= 5) return `${daysPassed} дня назад`;
+  else {
+    const day = `${date.getDate()}`.padStart(2, '0');
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+};
+
 const displayTransactions = function (account, sort = false) {
   containerTransactions.innerHTML = '';
 
@@ -137,12 +153,7 @@ const displayTransactions = function (account, sort = false) {
     const transType = trans > 0 ? 'deposit' : 'withdrawal';
 
     const date = new Date(account.transactionsDates[index]);
-
-    const day = `${date.getDate()}`.padStart(2, '0');
-    const month = `${date.getMonth() + 1}`.padStart(2, '0');
-    const year = date.getFullYear();
-
-    const transDate = `${day}/${month}/${year}`;
+    const transDate = formatTransactionDate(date);
 
     const transactionsRow = `
 		<div class="transactions__row">
