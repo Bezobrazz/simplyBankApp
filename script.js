@@ -243,7 +243,7 @@ const updateUi = function (account) {
   displayTotal(account);
 };
 
-let currentAccount;
+let currentAccount, currentLogoutTimer;
 
 // Alwayes logged in
 // currentAccount = account1;
@@ -257,6 +257,32 @@ let currentAccount;
 // labelDate.textContent = `${day}/${month}/${year}`;
 
 // Event heandlers........................................
+
+// Logout timer
+const startLogoutTimer = function () {
+  const logoutTimerCallback = () => {
+    const minutes = String(Math.trunc(time / 60)).padStart(2, '0');
+    const seconds = String(time % 60).padStart(2, '0');
+    // In each call show the remaining time in UI
+    labelTimer.textContent = `${minutes}:${seconds}`;
+
+    // After end of time stop the timer and logout
+    if (time === 0) {
+      clearInterval(logOutTimer);
+      containerApp.style.opacity = 0;
+      labelWelcome.textContent = `Увійдіть у свій акаунт`;
+    }
+    time--;
+  };
+  // Set logout time at 5 min
+  let time = 300;
+  // Call the timer every second
+  logoutTimerCallback();
+  const logOutTimer = setInterval(logoutTimerCallback, 1000);
+  return logOutTimer;
+};
+
+// Login
 btnLogin.addEventListener('click', function (event) {
   event.preventDefault();
   currentAccount = accounts.find(
@@ -292,6 +318,10 @@ btnLogin.addEventListener('click', function (event) {
     inputLoginUsername.value = '';
     inputLoginPin.value = '';
     inputLoginPin.blur();
+
+    // Chtck if the timer exists
+    if (currentLogoutTimer) clearInterval(currentLogoutTimer);
+    currentLogoutTimer = startLogoutTimer();
 
     updateUi(currentAccount);
   }
@@ -333,6 +363,10 @@ btnTransfer.addEventListener('click', function (event) {
     currentAccount.transactionsDates.push(new Date().toISOString());
     recipientAccount.transactionsDates.push(new Date().toISOString());
     updateUi(currentAccount);
+    // Reset the timer
+    clearInterval(currentLogoutTimer);
+    currentLogoutTimer = startLogoutTimer();
+
     inputTransferTo.value = '';
     inputTransferAmount.value = '';
   } else if (currentAccount.balance < transferAmount) {
@@ -400,7 +434,14 @@ btnLoan.addEventListener('click', function (event) {
   } else if (loanAmount > maxTransaction) {
     loanTitle.textContent = `Максимальна позика ${maxTransaction * 10}$`;
     loanTitle.style.color = 'red';
+    setTimeout(() => {
+      loanTitle.textContent = 'Запросити позику';
+      loanTitle.style.color = '#333';
+    }, 3000);
   }
+  // Reset the timer
+  clearInterval(currentLogoutTimer);
+  currentLogoutTimer = startLogoutTimer();
 });
 
 let transactionsSorted = false;
