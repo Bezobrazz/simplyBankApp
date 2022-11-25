@@ -256,7 +256,7 @@ let currentAccount;
 
 // labelDate.textContent = `${day}/${month}/${year}`;
 
-// Event heandlers
+// Event heandlers........................................
 btnLogin.addEventListener('click', function (event) {
   event.preventDefault();
   currentAccount = accounts.find(
@@ -297,6 +297,7 @@ btnLogin.addEventListener('click', function (event) {
   }
 });
 
+// Transfer transactions
 btnTransfer.addEventListener('click', function (event) {
   event.preventDefault();
   const transferAmount = Number(inputTransferAmount.value);
@@ -321,6 +322,10 @@ btnTransfer.addEventListener('click', function (event) {
     console.log('transfer');
     informationText.textContent = 'Кошти надіслано';
     informationText.style.color = 'green';
+    setTimeout(() => {
+      informationText.textContent = 'Перерахувати кошти';
+      informationText.style.color = '#333';
+    }, 3000);
     // Add transactions
     currentAccount.transactions.push(-transferAmount);
     recipientAccount.transactions.push(transferAmount);
@@ -339,6 +344,7 @@ btnTransfer.addEventListener('click', function (event) {
   }
 });
 
+// Close the account
 btnClose.addEventListener('click', function (event) {
   event.preventDefault();
   if (
@@ -368,6 +374,7 @@ btnClose.addEventListener('click', function (event) {
   });
 });
 
+// Ask loan
 btnLoan.addEventListener('click', function (event) {
   event.preventDefault();
   const loanAmount = Math.floor(inputLoanAmount.value);
@@ -377,12 +384,19 @@ btnLoan.addEventListener('click', function (event) {
     loanAmount > 0 &&
     currentAccount.transactions.some(trans => trans >= (loanAmount * 10) / 100)
   ) {
-    currentAccount.transactions.push(loanAmount);
-    currentAccount.transactionsDates.push(new Date().toISOString());
-    updateUi(currentAccount);
-    inputLoanAmount.value = '';
-    loanTitle.textContent = 'Позика отримана, вітаємо!';
-    loanTitle.style.color = 'green'; //set timer change color to #333
+    loanTitle.textContent = 'Запит в обробці...';
+    setTimeout(function () {
+      currentAccount.transactions.push(loanAmount);
+      currentAccount.transactionsDates.push(new Date().toISOString());
+      updateUi(currentAccount);
+      inputLoanAmount.value = '';
+      loanTitle.textContent = 'Позика отримана, вітаємо!';
+      loanTitle.style.color = 'green';
+      setTimeout(() => {
+        loanTitle.textContent = 'Запросити позику';
+        loanTitle.style.color = '#333'; //set timer change color to #333
+      }, 3000);
+    }, 5000);
   } else if (loanAmount > maxTransaction) {
     loanTitle.textContent = `Максимальна позика ${maxTransaction * 10}$`;
     loanTitle.style.color = 'red';
