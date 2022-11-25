@@ -221,12 +221,12 @@ let currentAccount;
 // currentAccount = account1;
 // containerApp.style.opacity = '100';
 
-const now = new Date();
-const day = `${now.getDate()}`.padStart(2, '0');
-const month = `${now.getMonth() + 1}`.padStart(2, '0');
-const year = now.getFullYear();
+// const now = new Date();
+// const day = `${now.getDate()}`.padStart(2, '0');
+// const month = `${now.getMonth() + 1}`.padStart(2, '0');
+// const year = now.getFullYear();
 
-labelDate.textContent = `${day}/${month}/${year}`;
+// labelDate.textContent = `${day}/${month}/${year}`;
 
 // Event heandlers
 btnLogin.addEventListener('click', function (event) {
@@ -241,6 +241,24 @@ btnLogin.addEventListener('click', function (event) {
     labelWelcome.textContent = `З поверненням, ${
       currentAccount.userName.split(' ')[0]
     }!`;
+
+    const now = new Date();
+    const options = {
+      hour: 'numeric',
+      minute: 'numeric',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      weekday: 'long',
+    };
+
+    const locale = navigator.language;
+    console.log(locale);
+
+    labelDate.textContent = new Intl.DateTimeFormat(
+      currentAccount.locale,
+      options
+    ).format(now);
 
     // Clear inputs
     inputLoginUsername.value = '';
