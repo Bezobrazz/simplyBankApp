@@ -71,7 +71,7 @@ const account4 = {
     '2021-01-22T12:17:46.255Z',
     '2021-02-12T15:14:06.486Z',
   ],
-  currency: 'EUR',
+  currency: 'CAD',
   locale: 'fr-CA',
 };
 
@@ -126,7 +126,7 @@ const deletelConfirmationModal = document.querySelector('.modal__container');
 const deletelConfirmationYes = document.querySelector('.modal__btn-yes');
 const deletelConfirmationNo = document.querySelector('.modal__btn-no');
 
-const formatTransactionDate = function (date) {
+const formatTransactionDate = function (date, locale) {
   const getDaysBetweenTwoDates = (date1, date2) =>
     Math.round(Math.abs((date2 - date1) / (1000 * 60 * 60 * 24)));
   const daysPassed = getDaysBetweenTwoDates(new Date(), date);
@@ -135,11 +135,19 @@ const formatTransactionDate = function (date) {
   if (daysPassed === 1) return 'Вчора';
   if (daysPassed <= 5) return `${daysPassed} дня назад`;
   else {
-    const day = `${date.getDate()}`.padStart(2, '0');
-    const month = `${date.getMonth() + 1}`.padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+    // const day = `${date.getDate()}`.padStart(2, '0');
+    // const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    // const year = date.getFullYear();
+    // return `${day}/${month}/${year}`;
+    return new Intl.DateTimeFormat(locale).format(date);
   }
+};
+
+const formatCurrency = function (value, locale, currency) {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency,
+  }).format(value);
 };
 
 const displayTransactions = function (account, sort = false) {
@@ -153,15 +161,19 @@ const displayTransactions = function (account, sort = false) {
     const transType = trans > 0 ? 'deposit' : 'withdrawal';
 
     const date = new Date(account.transactionsDates[index]);
-    const transDate = formatTransactionDate(date);
-
+    const transDate = formatTransactionDate(date, account.locale);
+    const formattedTrans = formatCurrency(
+      trans,
+      account.locale,
+      account.currency
+    );
     const transactionsRow = `
 		<div class="transactions__row">
 		<div class="transactions__type transactions__type--${transType}">
 			${index + 1} ${transType}
 		</div>
 		<div class="transactions__date">${transDate}</div>
-		<div class="transactions__value">${trans.toFixed(2)}$</div>
+		<div class="transactions__value">${formattedTrans}</div>
 	</div>`;
 
     containerTransactions.insertAdjacentHTML('afterbegin', transactionsRow);
@@ -183,19 +195,31 @@ console.log(accounts);
 const displayBalance = function (account) {
   const balance = account.transactions.reduce((acc, elem) => acc + elem, 0);
   account.balance = balance;
-  labelBalance.textContent = `${balance.toFixed(2)}$`;
+  labelBalance.textContent = formatCurrency(
+    balance,
+    account.locale,
+    account.currency
+  );
 };
 
 const displayTotal = function (account) {
   const dipositTotal = account.transactions
     .filter(trans => trans > 0)
     .reduce((acc, trans) => acc + trans, 0);
-  labelSumIn.textContent = `${dipositTotal.toFixed(2)}$`;
+  labelSumIn.textContent = formatCurrency(
+    dipositTotal,
+    account.locale,
+    account.currency
+  );
 
   const withdrawalTotal = account.transactions
     .filter(trans => trans < 0)
     .reduce((acc, trans) => acc + trans, 0);
-  labelSumOut.textContent = `${withdrawalTotal.toFixed(2)}$`;
+  labelSumOut.textContent = formatCurrency(
+    withdrawalTotal,
+    account.locale,
+    account.currency
+  );
 
   const interestTotal = account.transactions
     .filter(trans => trans > 0)
@@ -203,7 +227,11 @@ const displayTotal = function (account) {
     .filter(depos => depos >= 5)
     .reduce((acc, interest) => acc + interest, 0);
 
-  labelSumInterest.textContent = `${interestTotal.toFixed(2)}$`;
+  labelSumInterest.textContent = formatCurrency(
+    interestTotal,
+    account.locale,
+    account.currency
+  );
 };
 
 const updateUi = function (account) {
