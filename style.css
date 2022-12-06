@@ -18,6 +18,7 @@ body {
 }
 
 nav {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -31,6 +32,19 @@ nav {
 
 .logo {
   height: 7rem;
+}
+.lang__wrapper {
+  position: absolute;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  width: 70px;
+}
+.lang__img {
+  width: 30px;
+  height: 20px;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .login {

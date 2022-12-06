@@ -391,9 +391,17 @@ btnClose.addEventListener('click', function (event) {
   } else {
     operationCloseTitle.textContent = 'Ім`я чи PIN не вірні';
     operationCloseTitle.style.color = 'yellow';
+    setTimeout(() => {
+      operationCloseTitle.textContent = 'Закрити рахунок';
+      operationCloseTitle.style.color = '#333';
+      inputCloseNickname.value = '';
+      inputClosePin.value = '';
+    }, 3000);
   }
   deletelConfirmationNo.addEventListener('click', function () {
     deletelConfirmationModal.style.display = 'none';
+    inputCloseNickname.value = '';
+    inputClosePin.value = '';
   });
   deletelConfirmationYes.addEventListener('click', function () {
     const curentAccountIndex = accounts.findIndex(
@@ -451,7 +459,7 @@ btnSort.addEventListener('click', function (event) {
   transactionsSorted = !transactionsSorted;
 });
 
-// Вибір кожної другої строки окраси у сірий колір
+// Added grey color to each second string
 // [...document.querySelectorAll('.transactions__row')].forEach(function (
 //   row,
 //   index
